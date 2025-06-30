@@ -3,6 +3,7 @@ import "dotenv/config"
 import cors from "cors"
 import connectDB from "./configs/db.js";
 import { clerkMiddleware} from '@clerk/express'
+// import { ClerkExpressRequireAuth } from '@clerk/clerk-sdk-node';
 import clerkWebhooks from "./controllers/clerkWebhooks.js";
 import userRouter from "./routes/userRoutes.js";
 import hotelRouter from "./routes/hotelRoutes.js";
@@ -21,6 +22,7 @@ app.use(cors())
 //middleware
 app.use(express.json())
 app.use(clerkMiddleware())
+// app.use(ClerkExpressRequireAuth());
 
 
 app.use("/api/clerk", clerkWebhooks)
