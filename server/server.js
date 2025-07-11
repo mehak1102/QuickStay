@@ -49,44 +49,44 @@
 // app.listen(PORT, ()=> console.log(`Server running on port ${PORT}`));
 
 
-import express from "express";
-import "dotenv/config";
-import cors from "cors";
-import bodyParser from "body-parser"; // ✅ Add this
-import connectDB from "./configs/db.js";
-import { clerkMiddleware } from "@clerk/express";
-import clerkWebhooks from "./controllers/clerkWebhooks.js";
-import userRouter from "./routes/userRoutes.js";
-import hotelRouter from "./routes/hotelRoutes.js";
-import connectCloudinary from "./configs/cloudinary.js";
-import roomRouter from "./routes/roomRoutes.js";
-import bookingRouter from "./routes/bookingRoutes.js";
+import express from "express"
+import "dotenv/config"
+import cors from "cors"
+import connectDB from "./configs/db.js"
+import { clerkMiddleware } from "@clerk/express"
+import clerkWebhooks from "./controllers/clerkWebhooks.js"
+import userRouter from "./routes/userRoutes.js"
+import hotelRouter from "./routes/hotelRoutes.js"
+import connectCloudinary from "./configs/cloudinary.js"
+import roomRouter from "./routes/roomRoutes.js"
+import bookingRouter from "./routes/bookingRoutes.js"
 
-connectDB();
-connectCloudinary();
+connectDB()
+connectCloudinary()
 
-const app = express();
-app.use(cors());
+const app = express()
 
-// ✅ Use raw bodyParser only for the Clerk webhook route
-app.use("/api/clerk", bodyParser.raw({ type: "application/json" }));
+// ✅ Use secure CORS config here
+app.use(cors({
+  origin: [
+    "http://localhost:5173",
+    "https://quickstay-frontend-y6hk.onrender.com"
+  ],
+  credentials: true
+}))
 
-// ✅ Use normal JSON parser for all other routes
-app.use(express.json());
+// Middleware
+app.use(express.json())
+app.use(clerkMiddleware())
 
-// ✅ Clerk auth middleware
-app.use(clerkMiddleware());
+// Routes
+app.use("/api/clerk", clerkWebhooks)
+app.use('/api/user', userRouter)
+app.use('/api/hotels', hotelRouter)
+app.use('/api/rooms', roomRouter)
+app.use('/api/bookings', bookingRouter)
 
-// ROUTES
-app.use("/api/clerk", clerkWebhooks); // ✅ Webhook endpoint
-app.use("/api/user", userRouter);
-app.use("/api/hotels", hotelRouter);
-app.use("/api/rooms", roomRouter);
-app.use("/api/bookings", bookingRouter);
+app.get('/', (req, res) => res.send("API is working"))
 
-// HEALTH CHECK
-app.get("/", (req, res) => res.send("API is working"));
-
-// START SERVER
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+const PORT = process.env.PORT || 3000
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
