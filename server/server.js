@@ -70,7 +70,7 @@ const app = express()
 app.use(cors({
   origin: [
     "http://localhost:5173",
-    "https://quickstay-hotelbooking.vercel.app"
+    "https://quick-stay-amber.vercel.app/"
   ],
   credentials: true
 }))
